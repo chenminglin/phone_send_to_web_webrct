@@ -35,7 +35,7 @@ export default function DesktopPage() {
         peer.on('signal', async (data: any) => {
           // 当接收到offer后，生成answer信令数据
           console.log('生成应答信令数据:', data);
-          
+
           // 将应答信令数据发送回手机端
           try {
             const response = await fetch(`/api/answer?id=${id}`, {
@@ -45,11 +45,11 @@ export default function DesktopPage() {
               },
               body: JSON.stringify(data),
             });
-            
+
             if (!response.ok) {
               throw new Error(`应答信令发送失败: ${response.status}`);
             }
-            
+
             console.log('应答信令数据已发送到服务器');
           } catch (error) {
             console.error('发送应答信令数据失败:', error);
@@ -73,10 +73,10 @@ export default function DesktopPage() {
         });
 
         peerRef.current = peer;
-        
+
         // 记录已处理的信令数据版本
         let processedVersion = 0;
-        
+
         // 定期检查是否有新的信令数据
         const checkSignalInterval = setInterval(async () => {
           if (connected) {
@@ -84,29 +84,29 @@ export default function DesktopPage() {
             clearInterval(checkSignalInterval);
             return;
           }
-          
+
           try {
             console.log(`正在检查ID为${id}的信令数据...`);
             const signalResponse = await fetch(`/api/signal?id=${id}&version=${processedVersion}`);
-            
+
             if (signalResponse.status === 404) {
               console.log(`ID为${id}的信令数据尚未准备好，等待中...`);
               return; // 继续等待下一次轮询
             }
-            
+
             if (!signalResponse.ok) {
               console.error(`获取信令数据失败，状态码: ${signalResponse.status}`);
               return;
             }
-            
+
             const signalData = await signalResponse.json();
-            
+
             // 检查是否有更新
             if (signalData.noUpdate) {
               console.log('没有新的信令数据，继续等待...');
               return;
             }
-            
+
             if (signalData.signal) {
               console.log('从API获取到信令数据:', signalData.signal);
               try {
@@ -114,7 +114,7 @@ export default function DesktopPage() {
                 if (signalData.version) {
                   processedVersion = signalData.version;
                 }
-                
+
                 // 只有在连接未建立时才应用信令数据
                 if (!connected) {
                   peer.signal(signalData.signal);
@@ -132,7 +132,7 @@ export default function DesktopPage() {
             console.error('获取信令数据失败:', error);
           }
         }, 2000); // 每2秒检查一次
-        
+
         return () => clearInterval(checkSignalInterval);
       } catch (error) {
         console.error('初始化Peer失败:', error);
@@ -159,10 +159,69 @@ export default function DesktopPage() {
     }
   };
 
+  const [copyStatus, setCopyStatus] = useState('');
+  const [copyUrlStatus, setCopyUrlStatus] = useState('');
+
+  const handleCopyUrl = async () => {
+    const url = process.env.NEXT_PUBLIC_USE_LOCAL_IP === 'true' 
+      ? `http://${localIp}:3000/mobile?id=${peerId}` 
+      : `https://${process.env.NEXT_PUBLIC_DOMAIN}/mobile?id=${peerId}`;
+
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(url);
+      } else {
+        const textArea = document.createElement('textarea');
+        textArea.value = url;
+        document.body.appendChild(textArea);
+        textArea.select();
+        const success = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        
+        if (!success) {
+          throw new Error('复制命令执行失败');
+        }
+      }
+      
+      setCopyUrlStatus('已复制');
+      setTimeout(() => setCopyUrlStatus(''), 2000);
+    } catch (error) {
+      console.error('复制失败:', error);
+      setCopyUrlStatus('复制失败');
+    }
+  };
+
+  const handleCopyId = async () => {
+    try {
+      // 首先尝试使用现代的Clipboard API
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(peerId);
+      } else {
+        // 备选方案：使用传统的document.execCommand方法
+        const textArea = document.createElement('textarea');
+        textArea.value = peerId;
+        document.body.appendChild(textArea);
+        textArea.select();
+        const success = document.execCommand('copy');
+        document.body.removeChild(textArea);
+        
+        if (!success) {
+          throw new Error('复制命令执行失败');
+        }
+      }
+      
+      setCopyStatus('已复制');
+      setTimeout(() => setCopyStatus(''), 2000);
+    } catch (error) {
+      console.error('复制失败:', error);
+      setCopyStatus('复制失败');
+    }
+  };
+
   return (
     <div className="min-h-screen p-8 flex flex-col items-center justify-center">
       <h1 className="text-3xl font-bold mb-8 text-gray-100">电脑端 - 接收数据</h1>
-      
+
       {!connected ? (
         <div className="flex flex-col items-center bg-white p-8 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-4 text-gray-900">连接步骤</h2>
@@ -171,11 +230,30 @@ export default function DesktopPage() {
             <li className="mb-2">输入下方的连接ID</li>
             <li>点击"连接"按钮</li>
           </ol>
-          
-          <div className="bg-gray-100 p-4 rounded-md mb-6 w-full text-center">
-            <p className="font-mono text-lg break-all text-gray-900">{peerId}</p>
+
+          <div className="bg-gray-100 p-4 rounded-md mb-6 w-full">
+            <div className="flex items-center justify-center space-x-2">
+              <p className="font-mono text-lg break-all text-gray-900">{peerId}</p>
+              <button
+                onClick={handleCopyId}
+                className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+              >
+                {copyStatus || '复制'}
+              </button>
+            </div>
+            <li className="mb-2">在手机上访问: 
+              <span className="font-mono bg-gray-100 p-1 rounded text-gray-900">
+                {process.env.NEXT_PUBLIC_USE_LOCAL_IP === 'true' ? `http://${localIp}:3000/mobile?id=${peerId}` : `https://${process.env.NEXT_PUBLIC_DOMAIN}/mobile?id=${peerId}`}
+              </span>
+              <button
+                onClick={handleCopyUrl}
+                className="ml-2 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors"
+              >
+                {copyUrlStatus || '复制'}
+              </button>
+            </li>
           </div>
-          
+
           <div className="text-center">
             <p className="text-sm text-gray-900 mb-2">或者扫描二维码访问手机端</p>
             {localIp && (
@@ -190,7 +268,7 @@ export default function DesktopPage() {
           <div className="bg-green-100 text-green-800 p-4 rounded-md mb-6">
             <p className="font-semibold">✓ 已连接到手机</p>
           </div>
-          
+
           <div className="bg-white p-6 rounded-lg shadow-md">
             <h2 className="text-xl font-semibold mb-4 text-gray-900">接收到的数据</h2>
             {receivedData.length > 0 ? (
@@ -211,3 +289,4 @@ export default function DesktopPage() {
     </div>
   );
 }
+
