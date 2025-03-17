@@ -164,7 +164,7 @@ export default function DesktopPage() {
 
   const handleCopyUrl = async () => {
     const url = process.env.NEXT_PUBLIC_USE_LOCAL_IP === 'true' 
-      ? `http://${localIp}:3000/mobile?id=${peerId}` 
+      ? `https://${localIp}:3000/mobile?id=${peerId}` 
       : `https://${process.env.NEXT_PUBLIC_DOMAIN}/mobile?id=${peerId}`;
 
     try {
@@ -226,7 +226,7 @@ export default function DesktopPage() {
         <div className="flex flex-col items-center bg-white p-8 rounded-lg shadow-md">
           <h2 className="text-xl font-semibold mb-4 text-gray-900">连接步骤</h2>
           <ol className="list-decimal list-inside mb-6 text-left text-gray-900">
-            <li className="mb-2">在手机上访问: <span className="font-mono bg-gray-100 p-1 rounded text-gray-900">{process.env.NEXT_PUBLIC_USE_LOCAL_IP === 'true' ? `http://${localIp}:3000/mobile` : `https://${process.env.NEXT_PUBLIC_DOMAIN}/mobile`}</span></li>
+            <li className="mb-2">在手机上访问: <span className="font-mono bg-gray-100 p-1 rounded text-gray-900">{process.env.NEXT_PUBLIC_USE_LOCAL_IP === 'true' ? `https://${localIp}:3000/mobile` : `https://${process.env.NEXT_PUBLIC_DOMAIN}/mobile`}</span></li>
             <li className="mb-2">输入下方的连接ID</li>
             <li>点击"连接"按钮</li>
           </ol>
@@ -243,7 +243,7 @@ export default function DesktopPage() {
             </div>
             <li className="mb-2">在手机上访问: 
               <span className="font-mono bg-gray-100 p-1 rounded text-gray-900">
-                {process.env.NEXT_PUBLIC_USE_LOCAL_IP === 'true' ? `http://${localIp}:3000/mobile?id=${peerId}` : `https://${process.env.NEXT_PUBLIC_DOMAIN}/mobile?id=${peerId}`}
+                {process.env.NEXT_PUBLIC_USE_LOCAL_IP === 'true' ? `https://${localIp}:3000/mobile?id=${peerId}` : `https://${process.env.NEXT_PUBLIC_DOMAIN}/mobile?id=${peerId}`}
               </span>
               <button
                 onClick={handleCopyUrl}
@@ -258,7 +258,7 @@ export default function DesktopPage() {
             <p className="text-sm text-gray-900 mb-2">或者扫描二维码访问手机端</p>
             {localIp && (
               <div className="bg-white p-4 inline-block">
-                <QRCode value={process.env.NEXT_PUBLIC_USE_LOCAL_IP === 'true' ? `http://${localIp}:3000/mobile?id=${peerId}` : `https://${process.env.NEXT_PUBLIC_DOMAIN}/mobile?id=${peerId}`} size={200} />
+                <QRCode value={process.env.NEXT_PUBLIC_USE_LOCAL_IP === 'true' ? `https://${localIp}:3000/mobile?id=${peerId}` : `https://${process.env.NEXT_PUBLIC_DOMAIN}/mobile?id=${peerId}`} size={200} />
               </div>
             )}
           </div>

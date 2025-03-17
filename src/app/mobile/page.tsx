@@ -174,7 +174,7 @@ function MobilePageContent() {
               id="peerId"
               value={peerId}
               onChange={(e) => setPeerId(e.target.value)}
-              className={`w-full px-3 py-2 border ${autoFilled ? 'border-green-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500`}
+              className={`w-full px-3 py-2 border ${autoFilled ? 'border-green-500' : 'border-gray-300'} rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900`}
               placeholder="输入电脑端显示的连接ID"
             />
             {autoFilled && (
@@ -221,7 +221,7 @@ function MobilePageContent() {
                 type="text"
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                className="flex-grow px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-grow px-3 py-2 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900"
                 placeholder="输入要发送的文本"
               />
               <button
