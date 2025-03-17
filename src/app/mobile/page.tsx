@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 
-export default function MobilePage() {
+function MobilePageContent() {
   const searchParams = useSearchParams();
   const [peerId, setPeerId] = useState('');
   const [connected, setConnected] = useState(false);
@@ -235,5 +235,13 @@ export default function MobilePage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function MobilePage() {
+  return (
+    <Suspense fallback={<div>加载中...</div>}>
+      <MobilePageContent />
+    </Suspense>
   );
 }
