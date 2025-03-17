@@ -1,0 +1,27 @@
+.gameCanvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.gameContainer {
+  position: relative;
+  width: 100%;
+  height: 70vh;
+  overflow: hidden;
+}
+
+.controlInstructions {
+  text-align: center;
+  margin-bottom: 1rem;
+  color: #fff;
+}
+
+.bikeAnimation {
+  animation: pedal 2s infinite linear;
+}
+
+@keyframes pedal {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
