@@ -1,5 +1,18 @@
 'use client';
 
+// 扩展DeviceMotionEvent接口以支持iOS的requestPermission API
+interface DeviceMotionEventWithPermission extends DeviceMotionEvent {
+  requestPermission?: () => Promise<'granted' | 'denied'>;
+}
+
+interface DeviceMotionEventWithPermissionConstructor {
+  new(type: string, eventInitDict?: DeviceMotionEventInit): DeviceMotionEvent;
+  prototype: DeviceMotionEvent;
+  requestPermission?: () => Promise<'granted' | 'denied'>;
+}
+
+declare const DeviceMotionEvent: DeviceMotionEventWithPermissionConstructor;
+
 import { useEffect, useState, useRef, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 
